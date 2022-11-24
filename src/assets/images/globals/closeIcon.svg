@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <g id="Icon_-_Close" data-name="Icon - Close" transform="translate(0 24)">
+        <path id="Reference_Area" fill="rgba(148,247,85,0)" d="M0 0H24V24H0z" data-name="Reference Area" transform="translate(0 -24)"/>
+        <path id="Close_Icon" fill="#1d2951" d="M14.639 12.995l5.013-5A1.17 1.17 0 1 0 18 6.339l-5 5.013-5-5.013a1.17 1.17 0 0 0-1.661 1.655l5.013 5L6.339 18a1.17 1.17 0 1 0 1.655 1.655l5-5.013 5 5.013A1.17 1.17 0 1 0 19.651 18z" data-name="Close Icon" transform="translate(-.994 -24.996)"/>
+    </g>
+</svg>
