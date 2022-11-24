@@ -1,5 +1,6 @@
 import { getDocs, collection, getCountFromServer, query, where, limit, orderBy, Timestamp, doc, getDoc, addDoc, setDoc } from "firebase/firestore"
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
+import { Alert } from "react-native"
 import { db, storage, storageRef } from "./firebase"
 // utils
 const list = collection(db, 'list')
@@ -38,8 +39,8 @@ const getImageUrl = async (uri, imagesRef) => {
         const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
         console.log('url from promise', url);
         imagesRef.push(url)
-    } catch (err) {
-        console.log(err.message)
+    } catch (e) {
+        Alert.alert(e);
     }
 
 }
@@ -50,27 +51,30 @@ function firestoreTimeStamp() { return Timestamp.now() }
 
 
 // api
-const addItem = (obj, images) => {
+const addItem = (obj, images, setIsLoading, navigation) => {
+    setIsLoading(true)
     const imagesRefs = []
-    Promise.all(images.map ( img => getImageUrl(img, imagesRefs)))
+    Promise.all(images.map(img => getImageUrl(img, imagesRefs)))
         .then(() => {
             console.log(imagesRefs)
             obj.gallery = imagesRefs
             obj.createdAt = firestoreTimeStamp()
-        }).then(async() => {
-            console.log('objjj', obj);
-            try{
+        }).then(async () => {
+            try {
                 const docRef = await addDoc(list, obj);
-                console.log("Document written with ID: ", docRef.id);
-            }catch(e){
-                console.log(e);
+                setIsLoading(false)
+                navigation.replace('viewPage', { id: docRef.id });
+            } catch (e) {
+                setIsLoading(false)
+                Alert.alert(e);
             }
         }).catch(e => {
-            console.log(e);
+            setIsLoading(false)
+            Alert.alert(e);
         })
 }
 
-const getHeader = async (setData, setCategories, setStatus) => {
+const getHeader = async (setData, setCategories) => {
     try {
         let result = []
         let categories = []
@@ -84,10 +88,9 @@ const getHeader = async (setData, setCategories, setStatus) => {
         })
         setData(['all', ...new Set(result.sort())])
         setCategories([...new Set(categories.sort())])
-        setStatus([...new Set(status.sort())])
 
     } catch (e) {
-        console.log(e)
+        Alert.alert(e);
     }
 
 }
@@ -109,32 +112,22 @@ const getPageData = async (setData, setIsLoading = () => { }, setError = () => {
         setIsLoading(false)
         return setData({ resultCount, data: result.sort((a, b) => b.data.createdAt.seconds - a.data.createdAt.seconds) })
     } catch (e) {
-        console.log(e);
-        // setError(e)
+        Alert.alert(e);
         setIsLoading(false)
 
     }
 }
 
 const getOneById = async (setIsLoading = () => { }) => {
+    setIsLoading(true)
     try {
-        setIsLoading(true)
         const docRef = doc(db, 'list', 'O3k4dXXLcP3i4jBciVAn')
         const docSnap = await getDoc(docRef)
-        if (docSnap.exists()) {
-            console.log("Document data:", docSnap.data(), doc.id);
-            setIsLoading(false)
-            return { id: doc.id, data: docSnap.data() }
-        } else {
-            // doc.data() will be undefined in this case
-            console.log("No such document!");
-            setIsLoading(false)
-
-        }
-    } catch (e) {
-        console.log(e);
         setIsLoading(false)
-
+        return { id: doc.id, data: docSnap.data() }
+    }catch (e) {
+        setIsLoading(false)
+        Alert.alert(e);
     }
 }
 

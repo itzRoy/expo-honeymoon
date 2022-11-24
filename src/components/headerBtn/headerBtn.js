@@ -1,7 +1,6 @@
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import AppText from '../components/appText/AppText';
-import colors from '../styles/colors';
+ import colors from '../../styles/colors';
 
 const HeaderBtn = ({name, number, isActive, onPressHandler, filterTitle}) => {
   const [active, setActive] = useState(false);

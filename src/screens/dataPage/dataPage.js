@@ -7,21 +7,23 @@ import Filter from '../../components/filter/filter';
 import styles from './dataPage.styles';
 import { getHeader, getPageData } from '../../../api';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView } from 'react-native-gesture-handler';
 const DataPage = ({navigation}) => {
   const [isActive, setIsActive] = useState();
   const [{data, resultCount}, setData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [headerElements, setHeaderElements] = useState([])
   const [categories, setCategories] = useState([])
-  const [statuses, setStatus] = useState([])
   const [modalVisible, setModalVisible] = useState(false);
   const [filteredData, setFilteredData] = useState()
-
+  const [refresh, setRefresh] = useState(false)
+  const statuses = ['Rent', 'Not Rent', 'On hold', 'Sold', 'Not sold']
   useEffect(() => {
-    getHeader(setHeaderElements, setCategories, setStatus)
+    getHeader(setHeaderElements, setCategories)
     getPageData(setData, setIsLoading, () =>{}, isActive)
+    setRefresh(false)
     return () => setData([{data: [], resultCount: null}]);
-  }, [isActive]);
+  }, [isActive, refresh]);
   return (
     <SafeAreaView>
       <Header
@@ -41,6 +43,7 @@ const DataPage = ({navigation}) => {
       setFilteredData={setFilteredData}
       data={data}
       isActive={isActive}
+
        />
       {isLoading ? (
         <View>
@@ -56,8 +59,9 @@ const DataPage = ({navigation}) => {
           data={filteredData ? filteredData : data} 
           numColumns={2}
           contentContainerStyle={styles.list}
-          // eslint-disable-next-line react/jsx-props-no-spreading
-          renderItem={obj => <Card {...obj} />}
+          renderItem={obj => <Card {...obj} navigation={navigation} />}
+          onRefresh={() => setRefresh(true)}
+          refreshing={refresh}
         />
         </View>
       )}

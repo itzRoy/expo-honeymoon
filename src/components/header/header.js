@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Svg, { SvgXml } from 'react-native-svg';
 // import { getOnlyheaderElements } from '../../../api';
-import HeaderBtn from '../headerBtn';
 import Filter from '../../assets/images/globals/filter.svg'
 import Plus from '../../assets/images/globals/plus.svg'
 import PlusBtn from '../plusBtn/plusBtn';
 import { getHeader } from '../../../api';
 import styles from './header.styles';
+import HeaderBtn from '../headerBtn/headerBtn';
 
 const Header = ({ isActive, setIsActive, count, headerElements,categories, statuses, onFilterPress, navigation }) => {
   const onPressHandler = name => () => {

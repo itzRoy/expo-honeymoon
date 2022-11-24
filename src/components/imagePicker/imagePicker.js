@@ -21,8 +21,8 @@ const ImagePickerComp = ({ image, setImage }) => {
     };
     return (
         <View style={{ width: '90%', flexDirection: 'row' }}>
-            {image && image.map(img => {
-                return <Pressable style={styles.container} onPress={() => setImage(prev => prev.filter(i => i != img))}>
+            {image && image.map((img, i) => {
+                return <Pressable key={i} style={styles.container} onPress={() => setImage(prev => prev.filter(i => i != img))}>
                 <View >
                     <Image
                         source={{ uri: img }}

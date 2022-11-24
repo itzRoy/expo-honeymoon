@@ -15,7 +15,7 @@ import FormPage from './src/screens/formPage/formPage';
           <NavigationContainer>
       <Stack.Navigator >
         <Stack.Screen name="dataPage" component={DataPage} options={{headerShown: false}}/>
-        <Stack.Screen name="viewPage" component={ViewPage} options={{headerShown: false}}/>
+        <Stack.Screen name="viewPage" component={ViewPage} options={{animation: 'slide_from_right', headerShown: true, headerTitle: ''}}/>
         <Stack.Screen name="formPage" component={FormPage} options={{animation: 'slide_from_right', headerShown: true, headerTitle: ''}} />
             
       </Stack.Navigator>

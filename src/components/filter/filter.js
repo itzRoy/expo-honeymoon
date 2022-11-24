@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Modal, StyleSheet, Text, Pressable, View } from 'react-native';
+import { Modal, StyleSheet, Text, Pressable, View } from 'react-native';
 import colors from '../../styles/colors';
-import HeaderBtn from '../headerBtn';
+import HeaderBtn from '../headerBtn/headerBtn';
 
 const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, setFilteredData, isActive }) => {
   const initialValues = {
@@ -60,7 +60,6 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
 
         visible={modalVisible}
         onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
           setModalVisible(!modalVisible);
         }}>
         {categories && statuses && <View style={styles.centeredView}>
