@@ -1,4 +1,4 @@
-import {ActivityIndicator, FlatList, View} from 'react-native';
+import {ActivityIndicator, BackHandler, FlatList, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import colors from '../../styles/colors';
 import Header from '../../components/header/header';
@@ -17,13 +17,24 @@ const DataPage = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [filteredData, setFilteredData] = useState()
   const [refresh, setRefresh] = useState(false)
+  const [search, setSearch] = useState('')
   const statuses = ['Rent', 'Not Rent', 'On hold', 'Sold', 'Not sold']
+
   useEffect(() => {
     getHeader(setHeaderElements, setCategories)
     getPageData(setData, setIsLoading, () =>{}, isActive)
     setRefresh(false)
     return () => setData([{data: [], resultCount: null}]);
   }, [isActive, refresh]);
+const backAction = () => {
+  if(search) setSearch('')
+}
+  useEffect(() => {
+    if(search){
+      BackHandler.addEventListener('hardwareBackPress', backAction)
+      return () => BackHandler.removeEventListener(backAction)
+    }
+  }, [])
   return (
     <SafeAreaView>
       <Header
@@ -35,6 +46,8 @@ const DataPage = ({navigation}) => {
         navigation={navigation}
         categories={categories}
         statuses={statuses}
+        search={search}
+        setSearch={setSearch}
       />
       <Filter
       modalVisible={modalVisible} 
@@ -43,6 +56,8 @@ const DataPage = ({navigation}) => {
       setFilteredData={setFilteredData}
       data={data}
       isActive={isActive}
+      addresses={headerElements}
+      search={search}
 
        />
       {isLoading ? (
@@ -54,14 +69,15 @@ const DataPage = ({navigation}) => {
           />
         </View>
       ) : (
-        <View style={{alignContent: 'center', width: '100%', paddingBottom: 160}}>
+        <View >
         <FlatList
-          data={filteredData ? filteredData : data} 
+          data={filteredData || search ? filteredData : data} 
           numColumns={2}
           contentContainerStyle={styles.list}
           renderItem={obj => <Card {...obj} navigation={navigation} />}
           onRefresh={() => setRefresh(true)}
           refreshing={refresh}
+          keyExtractor={(item) => item.id}
         />
         </View>
       )}

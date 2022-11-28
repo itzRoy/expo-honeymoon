@@ -1,14 +1,86 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { ActivityIndicator, Modal, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import styles from './viewPage.styles'
+import { deleteById, getOneById, toDateTime } from '../../../api';
+import AppIntroSlider from 'react-native-app-intro-slider';
+import colors from '../../styles/colors';
+import { Image } from '@rneui/themed';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Button } from '@rneui/base';
 
-const ViewPage = ({route}) => {
+const ViewPage = ({ route, navigation }) => {
   const id = route.params.id
-  console.log(id);
+  const [data, setData] = useState()
+  const [isLoading, setIsLoading] = useState(false)
+  const [slides, setSlides] = useState([])
+  const [modalVisible, setModalVisible] = useState(false)
+  useEffect(() => {
+    getOneById(id, setData, setSlides, setIsLoading)
+  }, [])
+
+  const renderItem = ({ item }) => {
+    return (
+      <Image
+        source={{ uri: item.image}}
+        style={styles.imageStyle}
+        resizeMode='center'
+        PlaceholderContent={<ActivityIndicator color={colors.lightGreyHex} />}
+      />
+    );
+  }
+  const renderInfo = () => {
+    if(data){
+      delete data.data.gallery
+      data.data.createdAt = toDateTime(data.data.createdAt.seconds)
+     const result = Object.entries(data.data).map(([key, value]) => {
+      if(key === 'size') value = value + ' m²'
+      return (<View style={styles.infoContainer}>
+        <Text style={{fontWeight: 'bold'}}>{key} : </Text>
+        <Text style={{paddingRight: 10}}>{value}</Text>
+      </View>)
+     })
+     return result
+    }
+  }
   return (
-    <View>
-      <Text>ViewPage</Text>
-    </View>
+    <>
+        <View style={styles.centeredView}>
+        <Modal
+        animationType="fade"
+        transparent={true}
+
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+          <View style={styles.optionsContainer}>
+            <Text style={styles.modalText}>Are you sure you want to delete this</Text>
+            </View>
+            <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+              <Button title='Cancel' onPress={() => setModalVisible(false)} color={colors.green} />
+              <Button title='Delete' onPress={() => deleteById(id, setIsLoading, setModalVisible, navigation)} color={colors.red} />
+            </View>
+            </View>
+            </View>
+        </Modal>
+            </View>
+
+    {!isLoading ? (<><View style={styles.container}>
+        <AppIntroSlider renderItem={renderItem} data={slides} nextLabel='' doneLabel='' />
+      </View><ScrollView>
+          {renderInfo()}
+            <View style={{flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: 20}}>
+            <Button color={colors.bluey} containerStyle={{width: 100}} title='Edit' />
+            <Button color={colors.red} containerStyle={{width: 100}}  onPress={() => setModalVisible(true)} title='Delete' />
+          </View>
+
+
+        </ScrollView></>) : <ActivityIndicator size='large' color={colors.bluey} style={{marginBottom: '100%'}} />}
+    </>
+      
+     
   )
 }
 

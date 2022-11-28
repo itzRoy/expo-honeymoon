@@ -16,11 +16,11 @@ const ImagePickerComp = ({ image, setImage }) => {
 
         });
         if (!result.canceled) {
-            setImage(prev => [...prev, result.assets[0].uri]);
+            setImage(prev => [...prev, ...result.assets.map((i) => i.uri)]);
         }
     };
     return (
-        <View style={{ width: '90%', flexDirection: 'row' }}>
+        <View style={{ width: '90%', flexDirection: 'row', flexWrap: 'wrap' }}>
             {image && image.map((img, i) => {
                 return <Pressable key={i} style={styles.container} onPress={() => setImage(prev => prev.filter(i => i != img))}>
                 <View >
@@ -30,10 +30,10 @@ const ImagePickerComp = ({ image, setImage }) => {
                 </View>
                 </Pressable>
 })}
-            {image.length < 3 && <Pressable onPress={pickImage} style={[styles.container, styles.dashed]}>
+            <Pressable onPress={pickImage} style={[styles.container, styles.dashed]}>
                         <Text style={styles.dashedText}>select</Text>
                 </Pressable>
-            }
+            
         </View>
 
     );

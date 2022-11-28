@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     },
     list: {
       alignContent: 'center',
-      marginBottom: 200,
+      paddingBottom: 250,
     },
   });
 export default styles

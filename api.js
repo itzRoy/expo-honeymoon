@@ -1,4 +1,4 @@
-import { getDocs, collection, getCountFromServer, query, where, limit, orderBy, Timestamp, doc, getDoc, addDoc, setDoc } from "firebase/firestore"
+import { getDocs, collection, getCountFromServer, query, where, limit, orderBy, Timestamp, doc, getDoc, addDoc, setDoc, deleteDoc } from "firebase/firestore"
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 import { Alert } from "react-native"
 import { db, storage, storageRef } from "./firebase"
@@ -22,6 +22,13 @@ const getCount = async (ref) => {
     return result
 }
 
+export const toDateTime = (secs) => {
+    var t = new Date(1970, 0, 1); // Epoch
+    t.setSeconds(secs)
+    const format = t.toString().split(' ').splice(1, 4).join('-')
+   return format
+}
+
 const getImageUrl = async (uri, imagesRef) => {
     let filename = uri.split('/').pop();
     let match = /\.(\w+)$/.exec(filename);
@@ -37,7 +44,6 @@ const getImageUrl = async (uri, imagesRef) => {
         const snap = await uploadBytes(imgRef, bytes, metadata)
 
         const url = await getDownloadURL(ref(storage, snap.ref.fullPath));
-        console.log('url from promise', url);
         imagesRef.push(url)
     } catch (e) {
         Alert.alert(e);
@@ -47,7 +53,7 @@ const getImageUrl = async (uri, imagesRef) => {
 
 
 
-function firestoreTimeStamp() { return Timestamp.now() }
+function firestoreTimeStamp() { return { seconds: Math.floor(Date.now() / 1000 + 7200)} }
 
 
 // api
@@ -56,7 +62,6 @@ const addItem = (obj, images, setIsLoading, navigation) => {
     const imagesRefs = []
     Promise.all(images.map(img => getImageUrl(img, imagesRefs)))
         .then(() => {
-            console.log(imagesRefs)
             obj.gallery = imagesRefs
             obj.createdAt = firestoreTimeStamp()
         }).then(async () => {
@@ -118,19 +123,37 @@ const getPageData = async (setData, setIsLoading = () => { }, setError = () => {
     }
 }
 
-const getOneById = async (setIsLoading = () => { }) => {
+const getOneById = async (id, setData, setSlides, setIsLoading = () => { }) => {
     setIsLoading(true)
     try {
-        const docRef = doc(db, 'list', 'O3k4dXXLcP3i4jBciVAn')
+        const docRef = doc(db, 'list', id)
         const docSnap = await getDoc(docRef)
+        setData({ id: doc.id, data: docSnap.data() })
+        setSlides(docSnap.data().gallery.map((image, key) => (
+            {
+                image, 
+                key,
+            }
+            )))
         setIsLoading(false)
-        return { id: doc.id, data: docSnap.data() }
     }catch (e) {
         setIsLoading(false)
         Alert.alert(e);
     }
 }
 
+const deleteById = async (id, setIsLoading, setModalVisible, navigation) => {
+    setModalVisible(false)
+    setIsLoading(true)
+    const docRef = doc(db, 'list', id)
+    try{
+        await deleteDoc(docRef)
+        setIsLoading(false)
+        navigation.replace('dataPage')
+    }catch(e){
+        setIsLoading(false)
+        Alert.alert(e)
+    }
+}
 
-
-export { getPageData, getOneById, addItem, getHeader }
+export { getPageData, getOneById, addItem, getHeader, deleteById }

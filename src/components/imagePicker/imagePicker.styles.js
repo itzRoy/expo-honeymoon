@@ -3,7 +3,7 @@ import colors from "../../styles/colors";
 
 const styles = StyleSheet.create({
     container: {
-        width: '30%',
+        width: '27%',
         height: 160,
         marginLeft: 20,
         // aspectRatio: 9 / 14,

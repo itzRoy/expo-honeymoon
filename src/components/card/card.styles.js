@@ -12,12 +12,33 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         backgroundColor: colors.bluey
     },
-    date: { 
-        fontSize: 12, 
-        color: colors.caption, 
-        textAlign: 'center', 
-        marginBottom: 15 
+    date: {
+        fontSize: 12,
+        color: colors.caption,
+        textAlign: 'center',
+        marginBottom: 15
     },
+    textParent: { 
+        width: '100%', 
+        flexDirection: 'column',
+        height: 70,
+        position: 'absolute', 
+        bottom: 0, 
+        left: 0,
+        backgroundColor: colors.black, 
+        opacity: .3,
+        },
+        text: {
+            marginBottom: 10,
+            fontSize: 15,
+            color: colors.white,
+        },
+        category: {
+            textAlign: 'right',
+            marginLeft: 10,
+            fontSize: 10,
+            color: colors.white
+        },
     indicator: {
         position: 'absolute',
         flexDirection: 'row',

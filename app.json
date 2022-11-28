@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "expo-honeymoon",
+    "name": "Honeymoon",
     "slug": "expo-honeymoon",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -32,10 +32,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "io.expo.client.honeymoon"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7176da27-2408-4534-a72e-2f9e1262d880"
+      }
     }
   }
 }

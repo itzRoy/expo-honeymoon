@@ -1,7 +1,8 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
+import * as Clipboard from 'expo-clipboard';
 import colors from '../../styles/colors';
-import { addItem } from '../../../api';
+import { addItem, toDateTime } from '../../../api';
 import { ActivityIndicator } from 'react-native';
 import { Image } from '@rneui/base';
 import styles from './card.styles';
@@ -9,17 +10,17 @@ import styles from './card.styles';
 const Card = ({ item: { data, id }, navigation }) => {
   const { status, owner, phone, category, gallery, createdAt } = data
   const lowercaseStatus = status.toLowerCase()
-  function toDateTime(secs) {
-    var t = new Date(1970, 0, 1); // Epoch
-    t.setSeconds(secs)
-   return t
-}
- const date = toDateTime(createdAt.seconds).toString().split(' ').splice(1, 4).join('-')
- console.log(date);
-  // console.log(toDateTime(createdAt.seconds));
+
+
+
+const copyToClipboard = async () => {
+  await Clipboard.setStringAsync(phone);
+};
+
+ const date = toDateTime(createdAt.seconds)
   return (
     
-    <TouchableOpacity onPress={() => navigation.navigate('viewPage', {id})}>
+    <TouchableOpacity onLongPress={copyToClipboard} onPress={() => navigation.navigate('viewPage', {id})}>
 
       <View style={styles.container}>
         <Image
@@ -31,11 +32,12 @@ const Card = ({ item: { data, id }, navigation }) => {
 
           <View style={[styles.bgColor, { backgroundColor: lowercaseStatus === 'sold' || lowercaseStatus === 'rent' ? colors.green : lowercaseStatus === 'on hold' ? colors.orange : colors.red }]} />
           <Text>{status}</Text>
+          <Text style={styles.category}>{category}</Text>
         </View>}
-        <View style={{ width: '100%', position: 'absolute', padding: 10, bottom: 0, left: 0, backgroundColor: 'grey', opacity: .5 }}>
-          <Text style={{ color: 'white' }}>{owner}</Text>
-          <Text>{phone}</Text>
-          <Text>{category}</Text>
+          <View style={styles.textParent} />
+        <View style={{ width: '100%', position: 'absolute', bottom: 0, left: 0, justifyContent: 'space-between', paddingLeft: 10}}>
+          <Text style={styles.text}>{owner}</Text>
+          <Text style={styles.text}>{phone}</Text>
         </View>
       </View>
       <Text style={styles.date}>{date}</Text>

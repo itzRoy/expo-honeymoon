@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     wraper: {
       marginTop: 2,
+      paddingLeft: 10
     },
     outerContainer: {
       flexDirection: 'row',

@@ -2,7 +2,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import React, { useState } from 'react'
 import styles from './formPage.styles'
 import { Input } from '@rneui/themed';
-import { Alert, Text, View } from 'react-native';
+import { Alert, Text, View, KeyboardAvoidingView } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import ActionButton from '../../components/actionButton/ActionButton';
 import colors from '../../styles/colors';
@@ -23,6 +23,7 @@ const FormPage = ({ route, navigation }) => {
     category: '',
     type: '',
     status: '',
+    ref: '',
     price: null,
 
   }
@@ -41,8 +42,9 @@ const FormPage = ({ route, navigation }) => {
   }
 
   return (
-
+    
     <ScrollView>
+      <KeyboardAvoidingView>
       <Input
         placeholder='OWNER'
         keyboardType='name-phone-pad'
@@ -62,25 +64,23 @@ const FormPage = ({ route, navigation }) => {
         placeholder='PRICE'
         keyboardType='number-pad'
         onChangeText={value => setFormValues((prev) => ({ ...prev, price: value }))}
+        />
+        <Input
+        placeholder='REF.'
+        keyboardType='name-phone-pad'
+        onFocus={() => setFormValues((prev) => ({ ...prev, ref: '' }))}
+        onChangeText={value => setFormValues((prev) => ({ ...prev, ref: value }))}
+        value={formValues.ref}
       />
       <View style={styles.inputContainer}>
-        <Text style={styles.textLabel}>TYPE:</Text>
+        <Text style={[styles.textLabel, {paddingRight: 10}]}>TYPE:</Text>
         <HeaderBtn name='Rental' isActive={formValues.type} onPressHandler={() => () => setFormValues(prev => ({ ...prev, type: 'Rental' }))} />
         <HeaderBtn name='For Sale' isActive={formValues.type} onPressHandler={() => () => setFormValues(prev => ({ ...prev, type: 'For Sale' }))} />
       </View>
 
-      {/* <View style={styles.inputContainer}>
-        <Text style={styles.textLabel}>STATUS:</Text>
-        <HeaderBtn name='Rent' isActive={formValues.status} onPressHandler={() => () => setFormValues(prev => ({ ...prev, status: 'Rent' }))} />
-        <HeaderBtn name='Not Rent' isActive={formValues.status} onPressHandler={() => () => setFormValues(prev => ({ ...prev, status: 'Not Rent' }))} />
-        <HeaderBtn name='On Hold' isActive={formValues.status} onPressHandler={() => () => setFormValues(prev => ({ ...prev, status: 'On Hold' }))} />
-        <HeaderBtn name='Sold' isActive={formValues.status} onPressHandler={() => () => setFormValues(prev => ({ ...prev, status: 'Sold' }))} />
-        <HeaderBtn name='Not Sold' isActive={formValues.status} onPressHandler={() => () => setFormValues(prev => ({ ...prev, status: 'Not Sold' }))} />
-      </View> */}
-
       <View style={styles.inputContainer}>
       <Text style={styles.textLabel}>STATUS:</Text>
-      <View style={[{ flexDirection: 'row', marginHorizontal: 10, marginTop: -10, paddingBottom: 20, flexWrap: 'wrap' }]}>
+      <View style={[{ width: '75%', flexDirection: 'row', paddingHorizontal: 10, marginTop: -10, paddingBottom: 20, flexWrap: 'wrap' }]}>
         {statuses.map((name, i) => {
           return <HeaderBtn key={i} name={name} isActive={formValues.status} onPressHandler={() => () => setFormValues(prev => {
             if (formValues.status === name) return ({ ...prev, status: '' })
@@ -123,9 +123,12 @@ const FormPage = ({ route, navigation }) => {
       </View>
         <Input
           placeholder='Note'
+          multiline={true}
           onChangeText={value => setFormValues((prev) => ({ ...prev, note: value }))}
           value={formValues.note}
         />
+        </KeyboardAvoidingView>
+
       <ImagePickerComp image={image} setImage={setImage}  />
       <Button type='solid' color={colors.blueyLight} title='Submit' disabled={isLoading} onPress={submitHandler} />
     </ScrollView>

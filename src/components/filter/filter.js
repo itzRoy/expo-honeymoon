@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, StyleSheet, Text, Pressable, View } from 'react-native';
+import { Modal, StyleSheet, Text, Pressable, View, ScrollView } from 'react-native';
 import colors from '../../styles/colors';
 import HeaderBtn from '../headerBtn/headerBtn';
 
-const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, setFilteredData, isActive }) => {
+const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, setFilteredData, addresses, isActive, search }) => {
+
   const initialValues = {
     category: [],
-    status: []
+    status: [],
+    address: [],
+    type: [],
   }
   const [filterValues, setFilterValues] = useState(initialValues)
+  useEffect(() => {
+    setFilterValues(prev => ({ ...prev, address: [] }))
+  }, [isActive])
   const filterContent = [
+    {
+      title: 'type',
+      options: ['Rental', 'For Sale']
+    },
     {
       title: 'category',
       options: categories
@@ -17,28 +27,39 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
     {
       title: 'status',
       options: statuses
+    },
+    {
+      title: 'address',
+      options: addresses.filter((i) => i != 'all')
     }
   ]
+
   const applyFilter = () => {
     let result = data
-    if(result){
-    for (const [key, value] of Object.entries(filterValues)) {
-      let shallowValue = value
-      if(!value.length){
-        if(key === 'category') shallowValue = categories
-        if(key === 'status') shallowValue = statuses
+    if (search && result) {
+      const regexp = new RegExp(search, "gi");
+      result = result?.filter(item => item.data.owner.match(regexp) || search == item.data.ref)
+      return setFilteredData(result);
+    } else if (result) {
+      for (const [key, value] of Object.entries(filterValues)) {
+        let shallowValue = value
+        if (!value.length) {
+          if (key === 'category') shallowValue = categories
+          if (key === 'status') shallowValue = statuses
+          if (key === 'type') shallowValue = ['Rental', 'For Sale']
+          if (key === 'address') shallowValue = addresses
+        }
+        result = result.filter(({ data }) => shallowValue.includes(data[key]))
       }
-          result = result.filter(({data}) => shallowValue.includes(data[key]))
+      setFilteredData(result);
+      setModalVisible(false)
     }
-    setFilteredData(result);
-    setModalVisible(false)
   }
-    }
 
-    useEffect(() => {
-      applyFilter()
-    }, [data])
-  
+  useEffect(() => {
+    applyFilter()
+  }, [data, search])
+
   const onPressClear = () => {
     setFilterValues(initialValues)
     setFilteredData()
@@ -64,23 +85,26 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
         }}>
         {categories && statuses && <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Filter</Text>
-            {filterContent.map(({ title, options }) => {
-              return (
-                <View key={title} style={styles.optionsTitle}>
-                  <Text style={styles.textStyle}>{title}</Text>
-                  <View style={styles.optionsContainer}>
-                    {options.map((btn, i) => {
-                      return (
-                        <HeaderBtn filterTitle={title} isActive={filterValues} name={btn} key={i} onPressHandler={onBtnPress} />
-                      )
-                    })
-                    }
+            <ScrollView>
+              <Text style={styles.modalText}>Filter</Text>
+              {filterContent.map(({ title, options }) => {
+                if (title == 'address' && isActive != 'all') return <View />
+                return (
+                  <View key={title} style={styles.optionsTitle}>
+                    <Text style={styles.textStyle}>{title}</Text>
+                    <View style={styles.optionsContainer}>
+                      {options.map((btn, i) => {
+                        return (
+                          <HeaderBtn filterTitle={title} isActive={filterValues} name={btn} key={i} onPressHandler={onBtnPress} />
+                        )
+                      })
+                      }
+                    </View>
                   </View>
-                </View>
-              )
+                )
 
-            })}
+              })}
+            </ScrollView>
             <View style={styles.btnWraper}>
               <Pressable
 
@@ -130,6 +154,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightGreyHex,
     borderRadius: 20,
     padding: 15,
+    height: 450,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
