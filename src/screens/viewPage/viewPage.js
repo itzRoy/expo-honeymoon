@@ -7,8 +7,11 @@ import colors from '../../styles/colors';
 import { Image } from '@rneui/themed';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Button } from '@rneui/base';
+import { useNavigation, useRoute } from '@react-navigation/core';
 
-const ViewPage = ({ route, navigation }) => {
+const ViewPage = () => {
+  const navigation = useNavigation()
+  const route = useRoute()
   const id = route.params.id
   const [data, setData] = useState()
   const [isLoading, setIsLoading] = useState(false)
@@ -18,6 +21,9 @@ const ViewPage = ({ route, navigation }) => {
     getOneById(id, setData, setSlides, setIsLoading)
   }, [])
 
+  const onEditPress = () => {
+    navigation.replace('formPage', {id})
+  }
   const renderItem = ({ item }) => {
     return (
       <Image
@@ -31,10 +37,11 @@ const ViewPage = ({ route, navigation }) => {
   const renderInfo = () => {
     if(data){
       delete data.data.gallery
-      data.data.createdAt = toDateTime(data.data.createdAt.seconds)
+      data.data.created = toDateTime(data.data?.created)
+      data.data.updated = toDateTime(data.data?.updated)
      const result = Object.entries(data.data).map(([key, value]) => {
       if(key === 'size') value = value + ' m²'
-      return (<View style={styles.infoContainer}>
+      return (<View key={key} style={styles.infoContainer}>
         <Text style={{fontWeight: 'bold'}}>{key} : </Text>
         <Text style={{paddingRight: 10}}>{value}</Text>
       </View>)
@@ -72,7 +79,7 @@ const ViewPage = ({ route, navigation }) => {
       </View><ScrollView>
           {renderInfo()}
             <View style={{flexDirection: 'row', justifyContent: 'space-evenly', marginVertical: 20}}>
-            <Button color={colors.bluey} containerStyle={{width: 100}} title='Edit' />
+            <Button color={colors.bluey} containerStyle={{width: 100}} title='Edit' onPress={onEditPress} />
             <Button color={colors.red} containerStyle={{width: 100}}  onPress={() => setModalVisible(true)} title='Delete' />
           </View>
 

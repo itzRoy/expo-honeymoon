@@ -87,10 +87,10 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
           <View style={styles.modalView}>
             <ScrollView>
               <Text style={styles.modalText}>Filter</Text>
-              {filterContent.map(({ title, options }) => {
+              {filterContent.map(({ title, options }, i) => {
                 if (title == 'address' && isActive != 'all') return <View />
                 return (
-                  <View key={title} style={styles.optionsTitle}>
+                  <View key={i} style={styles.optionsTitle}>
                     <Text style={styles.textStyle}>{title}</Text>
                     <View style={styles.optionsContainer}>
                       {options.map((btn, i) => {

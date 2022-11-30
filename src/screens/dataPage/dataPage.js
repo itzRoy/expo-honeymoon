@@ -5,26 +5,16 @@ import Header from '../../components/header/header';
 import Card from '../../components/card/card';
 import Filter from '../../components/filter/filter';
 import styles from './dataPage.styles';
-import { getHeader, getPageData } from '../../../api';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView } from 'react-native-gesture-handler';
-const DataPage = ({navigation}) => {
-  const [isActive, setIsActive] = useState();
-  const [{data, resultCount}, setData] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [headerElements, setHeaderElements] = useState([])
-  const [categories, setCategories] = useState([])
-  const [modalVisible, setModalVisible] = useState(false);
+import { useNavigation, useRoute } from '@react-navigation/core';
+const DataPage = ({ data, isLoading, resultCount, headerElements, categories, statuses, isActive, setIsActive, refresh, setRefresh}) => {
   const [filteredData, setFilteredData] = useState()
-  const [refresh, setRefresh] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false);
+  const navigation= useNavigation()
   const [search, setSearch] = useState('')
-  const statuses = ['Rent', 'Not Rent', 'On hold', 'Sold', 'Not sold']
 
   useEffect(() => {
-    getHeader(setHeaderElements, setCategories)
-    getPageData(setData, setIsLoading, () =>{}, isActive)
     setRefresh(false)
-    return () => setData([{data: [], resultCount: null}]);
   }, [isActive, refresh]);
 const backAction = () => {
   if(search) setSearch('')
@@ -43,11 +33,11 @@ const backAction = () => {
         count={resultCount}
         headerElements={headerElements}
         onFilterPress={() => setModalVisible(true)}
-        navigation={navigation}
         categories={categories}
         statuses={statuses}
         search={search}
         setSearch={setSearch}
+        navigation={navigation}
       />
       <Filter
       modalVisible={modalVisible} 
@@ -77,7 +67,7 @@ const backAction = () => {
           renderItem={obj => <Card {...obj} navigation={navigation} />}
           onRefresh={() => setRefresh(true)}
           refreshing={refresh}
-          keyExtractor={(item) => item.id}
+          keyExtractor={obj => obj.id}
         />
         </View>
       )}

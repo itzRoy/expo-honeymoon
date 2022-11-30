@@ -8,7 +8,7 @@ import { Image } from '@rneui/base';
 import styles from './card.styles';
 
 const Card = ({ item: { data, id }, navigation }) => {
-  const { status, owner, phone, category, gallery, createdAt } = data
+  const { status, owner, phone, category, gallery, created } = data
   const lowercaseStatus = status.toLowerCase()
 
 
@@ -17,7 +17,7 @@ const copyToClipboard = async () => {
   await Clipboard.setStringAsync(phone);
 };
 
- const date = toDateTime(createdAt.seconds)
+ const date = toDateTime(created)
   return (
     
     <TouchableOpacity onLongPress={copyToClipboard} onPress={() => navigation.navigate('viewPage', {id})}>
