@@ -23,6 +23,8 @@ const FormPage = ({ address, categories, statuses }) => {
   const initialValues = {
     owner: '',
     phone: null,
+    nator: '',
+    natorPhone: '',
     address: '',
     category: '',
     type: '',
@@ -68,6 +70,18 @@ const FormPage = ({ address, categories, statuses }) => {
             keyboardType='phone-pad'
             onChangeText={value => setFormValues((prev) => ({ ...prev, phone: value }))} 
             value={formValues.phone}
+            />
+                 <Input
+            placeholder='NATOR NAME'
+            keyboardType='name-phone-pad'
+            onChangeText={value => setFormValues((prev) => ({ ...prev, nator: value }))} 
+            value={formValues.nator}
+            />
+             <Input
+            placeholder='NATOR PHONE'
+            keyboardType='phone-pad'
+            onChangeText={value => setFormValues((prev) => ({ ...prev, natorPhone: value }))} 
+            value={formValues.natorPhone}
             />
           <Input
             placeholder='PROPERTY SIZE'

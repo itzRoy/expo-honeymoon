@@ -3,7 +3,9 @@ import React from 'react'
 import * as ImagePicker from 'expo-image-picker';
 import styles from './imagePicker.styles';
 const ImagePickerComp = ({ image, setImage }) => {
-
+    const [status, requestPermission] = ImagePicker.useCameraPermissions();
+    console.log(status, requestPermission);
+    ImagePicker.launchCameraAsync({}).then(result => console.log(result))
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({

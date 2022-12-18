@@ -22,7 +22,7 @@ const Header = ({ isActive, setIsActive, count, headerElements, categories, stat
       <TouchableOpacity style={styles.filter} onPress={onFilterPress}>
         <Filter />
       </TouchableOpacity>
-      <TextInput cursorColor={colors.blueyLight} clearButtonMode='always' on value={search} onChange={(e) => setSearch(e.nativeEvent.text)} placeholder='Search by owner or ref' style={{ flex: 1, backgroundColor: colors.veryLightGrey, paddingHorizontal: 5 }} />
+      <TextInput cursorColor={colors.blueyLight} clearButtonMode='always' value={search} onChange={(e) => setSearch(e.nativeEvent.text)} placeholder='Search by owner or ref' style={{ flex: 1, backgroundColor: colors.veryLightGrey, paddingHorizontal: 5 }} />
       <TouchableOpacity style={styles.add} onPress={() => navigation.navigate('formPage', { address: headerElements, categories, statuses })}>
         <PlusBtn />
       </TouchableOpacity>

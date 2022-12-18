@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, StyleSheet, Text, Pressable, View, ScrollView } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import colors from '../../styles/colors';
 import HeaderBtn from '../headerBtn/headerBtn';
 
 const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, setFilteredData, addresses, isActive, search }) => {
 
+  const [from, setFrom] = useState(0)
+  const [to, setTo] = useState(9999999999)
   const initialValues = {
     category: [],
     status: [],
@@ -51,6 +54,7 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
         }
         result = result.filter(({ data }) => shallowValue.includes(data[key]))
       }
+      result = result.filter(({data}) => data.price >= from && data.price <= to)
       setFilteredData(result);
       setModalVisible(false)
     }
@@ -62,6 +66,8 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
 
   const onPressClear = () => {
     setFilterValues(initialValues)
+    setFrom(0)
+    setTo(9999999999)
     setFilteredData()
     setModalVisible(false)
   }
@@ -83,10 +89,15 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}>
-        {categories && statuses && <View style={styles.centeredView}>
+        <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <ScrollView>
               <Text style={styles.modalText}>Filter</Text>
+              <Text>Price</Text>
+              <View >
+                <TextInput placeholder='from' keyboardType='numeric' value={from} onChangeText={(t) => setFrom(t)} style={{backgroundColor: colors.veryLightGrey, flexGrow: 1, marginVertical: 5, paddingHorizontal: 5}} />
+                <TextInput placeholder='to' keyboardType='numeric' value={to} onChangeText={(t) => setTo(t)} style={{backgroundColor: colors.veryLightGrey, flexGrow: 1, marginVertical: 5, paddingHorizontal: 5}} />
+              </View>
               {filterContent.map(({ title, options }, i) => {
                 if (title == 'address' && isActive != 'all') return <View />
                 return (
@@ -119,7 +130,7 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
             </View>
           </View>
         </View>
-        }
+        
       </Modal>
     </View>
   );
