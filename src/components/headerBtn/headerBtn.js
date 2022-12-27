@@ -16,6 +16,8 @@ const HeaderBtn = ({name, number, isActive, onPressHandler, filterTitle}) => {
   }, [active, isActive, name]);
   const styles = StyleSheet.create({
     wraper: {
+      minWidth: 60,
+      justifyContent: 'center',
       backgroundColor: active ? colors.blueyLight : 'transparent',
       borderWidth: active ? 0 : 1,
       borderColor: colors.blueyLight,
@@ -30,7 +32,8 @@ const HeaderBtn = ({name, number, isActive, onPressHandler, filterTitle}) => {
     },
     text: {
       color: active ? colors.white : colors.blueyLight,
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      textAlign: 'center'
     },
     badge: {
       marginLeft: 5,

@@ -38,7 +38,7 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
   ]
 
   const applyFilter = () => {
-    let result = data
+    let result = data && [...data]
     if (search && result) {
       const regexp = new RegExp(search, "gi");
       result = result?.filter(item => item.data.owner.match(regexp) || search == item.data.ref)
@@ -54,7 +54,7 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
         }
         result = result.filter(({ data }) => shallowValue.includes(data[key]))
       }
-      result = result.filter(({data}) => data.price >= from && data.price <= to)
+      result = result.filter(({data}) => +data.price >= +from && +data.price <= +to)
       setFilteredData(result);
       setModalVisible(false)
     }
@@ -83,15 +83,15 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
     <View style={styles.centeredView}>
       <Modal
         animationType="slide"
-        transparent={true}
-
+        transparent
         visible={modalVisible}
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}>
-        <View style={styles.centeredView}>
+        <Pressable onPress={() => setModalVisible(!modalVisible)} style={styles.centeredView}>
           <View style={styles.modalView}>
             <ScrollView>
+              <Pressable>
               <Text style={styles.modalText}>Filter</Text>
               <Text>Price</Text>
               <View >
@@ -99,9 +99,9 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
                 <TextInput placeholder='to' keyboardType='numeric' value={to} onChangeText={(t) => setTo(t)} style={{backgroundColor: colors.veryLightGrey, flexGrow: 1, marginVertical: 5, paddingHorizontal: 5}} />
               </View>
               {filterContent.map(({ title, options }, i) => {
-                if (title == 'address' && isActive != 'all') return <View />
+                if (title == 'address' && isActive != 'all') return <View key={title} />
                 return (
-                  <View key={i} style={styles.optionsTitle}>
+                  <View key={title} style={styles.optionsTitle}>
                     <Text style={styles.textStyle}>{title}</Text>
                     <View style={styles.optionsContainer}>
                       {options.map((btn, i) => {
@@ -112,10 +112,13 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
                       }
                     </View>
                   </View>
+                  
                 )
 
               })}
+              </Pressable>
             </ScrollView>
+            
             <View style={styles.btnWraper}>
               <Pressable
 
@@ -129,7 +132,8 @@ const Filter = ({ modalVisible, setModalVisible, categories, statuses, data, set
               </Pressable>
             </View>
           </View>
-        </View>
+          </Pressable>
+
         
       </Modal>
     </View>

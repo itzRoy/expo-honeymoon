@@ -2,24 +2,34 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import React, { useEffect, useState } from 'react'
 import styles from './formPage.styles'
 import { Input } from '@rneui/themed';
-import { Alert, Text, View, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import { Alert, Text, View, KeyboardAvoidingView, ActivityIndicator, Platform, Linking } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import ActionButton from '../../components/actionButton/ActionButton';
 import colors from '../../styles/colors';
 import { Button } from '@rneui/base';
 import ImagePickerComp from '../../components/imagePicker/imagePicker';
 import { addItem, getOneById, updateItem, uploadImage } from '../../../api';
 import HeaderBtn from '../../components/headerBtn/headerBtn';
 import { useNavigation, useRoute } from '@react-navigation/core';
+import * as Location from 'expo-location';
 
 const FormPage = ({ address, categories, statuses }) => {
+  let text = {};
   const route = useRoute()
   const navigation = useNavigation()
   const { id } = route.params
   const [image, setImage] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
   const [dataIsLoading, setDataIsLoading] = useState()
-
+  // const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+  // const latLng = `${text?.coords?.latitude},${text?.coords?.longtitude}`;
+  // const label = 'Custom Label';
+  // const url = Platform.select({
+  //   ios: `${scheme}${label}@${latLng}`,
+  //   android: `${scheme}${latLng}(${label})`
+  // });
+  
+      
+  // Linking.openURL(url);
   const initialValues = {
     owner: '',
     phone: null,
@@ -31,12 +41,36 @@ const FormPage = ({ address, categories, statuses }) => {
     status: '',
     Ref: '',
     price: null,
-
+    location: '',
   }
+  const [location, setLocation] = useState(null);
   const [formValues, setFormValues] = useState(initialValues)
   useEffect(() => {
     if (id) getOneById(id, setFormValues, undefined, setDataIsLoading, true, setImage)
   }, [id])
+
+  
+
+
+  useEffect(() => {
+    if(!id){
+    (async () => {
+      
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location)
+    })();
+  }
+  }, []);
+
+  useEffect(() => {
+  location && setFormValues((prev) => ({ ...prev, location: location?.coords.latitude + ',' + location?.coords?.longitude }))
+}, [location])
 
   const submitHandler = async () => {
     
@@ -94,6 +128,12 @@ const FormPage = ({ address, categories, statuses }) => {
             keyboardType='number-pad'
             onChangeText={value => setFormValues((prev) => ({ ...prev, price: value }))} 
             value={formValues.price}
+            />
+            <Input
+            placeholder='LOCATION'
+            keyboardType='name-phone-pad'
+            onChangeText={value => setFormValues((prev) => ({ ...prev, location: value }))} 
+            value={formValues.location}
             />
           <Input
             placeholder='REF.'
@@ -158,7 +198,12 @@ const FormPage = ({ address, categories, statuses }) => {
             onChangeText={value => setFormValues((prev) => ({ ...prev, note: value }))}
             value={formValues.note} />
         </KeyboardAvoidingView>
-        <ImagePickerComp image={image} setImage={setImage} /><Button type='solid' color={colors.blueyLight} title='Submit' disabled={isLoading} onPress={submitHandler} /></>
+        <ImagePickerComp image={image} setImage={setImage} />
+        <Button type='solid' color={colors.blueyLight} title='Submit' disabled={isLoading} onPress={submitHandler} >
+          {!isLoading ? <Text style={{color: '#fff', marginRight: 10, fontWeight: '500'}}>Submit</Text> :
+        <ActivityIndicator color={colors.lightGreyHex} />}
+        </Button>
+        </>
       ) : (<ActivityIndicator size='large' color={colors.bluey} style={{marginTop: '55%'}} />)}
     </ScrollView>
   );

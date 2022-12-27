@@ -27,9 +27,7 @@ import { getHeader, getPageData } from './api';
         setRefresh(false)
         return () => setData([{data: [], resultCount: null}]);
       }, [isActive, refresh,]);
-
   
-      
       return (
         <NavigationContainer>
             <StatusBar backgroundColor='#f2f2f2' />

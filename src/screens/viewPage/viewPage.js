@@ -1,4 +1,4 @@
-import { ActivityIndicator, Modal, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Linking, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import styles from './viewPage.styles'
 import { deleteById, getOneById, toDateTime } from '../../../api';
@@ -21,9 +21,22 @@ const ViewPage = () => {
     getOneById(id, setData, setSlides, setIsLoading)
   }, [])
 
+  const locationArr = data?.data?.location?.split(',')
+  const onLoactionPress = () => {
+      const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+  const latLng = `${locationArr[0]},${locationArr[1]}`;
+  const label = data?.data?.owner + ', ' + data?.data?.address;
+  const url = Platform.select({
+    ios: `${scheme}${label}@${latLng}`,
+    android: `${scheme}${latLng}(${label})`
+  });
+      
+  Linking.openURL(url);
+  }
   const onEditPress = () => {
     navigation.replace('formPage', {id})
   }
+  console.log(data);
   const renderItem = ({ item }) => {
     return (
       <Image
@@ -39,16 +52,27 @@ const ViewPage = () => {
       delete data.data.gallery
       data.data.created = toDateTime(data.data?.created)
       data.data.updated = toDateTime(data.data?.updated)
-     const result = Object.entries(data.data).map(([key, value]) => {
-      if(key === 'size') value = value + ' m²'
+      const result = Object.keys(data.data).sort().map((key) => {
+      if(key === 'size') data.data[key] = data.data[key] + ' m²'
+      if(key === 'location') {
+        return (
+          <TouchableOpacity onPress={onLoactionPress} key={key} style={styles.infoContainer}>
+        <Text style={{fontWeight: 'bold'}}>{key} : </Text>
+        <View style={{backgroundColor: '#f0f0f0', padding: 5, borderRadius: 20}}>
+        <Text style={{paddingRight: 10, textAlign: 'center'}}>{data.data[key]}</Text>
+        </View>
+      </TouchableOpacity>
+        )
+      }
       return (<View key={key} style={styles.infoContainer}>
         <Text style={{fontWeight: 'bold'}}>{key} : </Text>
-        <Text style={{paddingRight: 10}}>{value}</Text>
+        <Text style={{paddingRight: 10}}>{data.data[key]}</Text>
       </View>)
      })
      return result
     }
   }
+
   return (
     <>
         <View style={styles.centeredView}>

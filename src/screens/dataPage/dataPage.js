@@ -19,6 +19,7 @@ const DataPage = ({ data, isLoading, resultCount, headerElements, categories, st
 const backAction = () => {
   if(search) setSearch('')
 }
+
   useEffect(() => {
     if(search){
       BackHandler.addEventListener('hardwareBackPress', backAction)
