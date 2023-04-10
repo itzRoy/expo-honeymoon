@@ -79,8 +79,8 @@ const updateItem = async (obj, images, setIsLoading, navigation, id) => {
             obj.updated = firestoreTimeStamp()
         }).then(async () => {
             try {
-                updateDoc(docRef, obj)
-                navigation.replace('viewPage', {id});
+                await updateDoc(docRef, obj)
+                navigation.pop();
             } catch (e) {
                 setIsLoading(false)
                 Alert.alert(e);

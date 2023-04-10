@@ -1,5 +1,5 @@
 import Icon from 'react-native-vector-icons/FontAwesome';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styles from './formPage.styles'
 import { Input } from '@rneui/themed';
 import { Alert, Text, View, KeyboardAvoidingView, ActivityIndicator, Platform, Linking } from 'react-native';
@@ -19,6 +19,7 @@ const FormPage = ({ address, categories, statuses }) => {
   const { id } = route.params
   const [image, setImage] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
+  const [locationLoading, setLocationLoading] = useState(false);
   const [dataIsLoading, setDataIsLoading] = useState()
   // const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
   // const latLng = `${text?.coords?.latitude},${text?.coords?.longtitude}`;
@@ -27,8 +28,8 @@ const FormPage = ({ address, categories, statuses }) => {
   //   ios: `${scheme}${label}@${latLng}`,
   //   android: `${scheme}${latLng}(${label})`
   // });
-  
-      
+
+
   // Linking.openURL(url);
   const initialValues = {
     owner: '',
@@ -48,14 +49,11 @@ const FormPage = ({ address, categories, statuses }) => {
   useEffect(() => {
     if (id) getOneById(id, setFormValues, undefined, setDataIsLoading, true, setImage)
   }, [id])
+  console.log(locationLoading);
 
-  
-
-
-  useEffect(() => {
-    if(!id){
-    (async () => {
-      
+  const takeLocation = useCallback(async () => {
+    setLocationLoading(true)
+    try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission to access location was denied');
@@ -64,27 +62,37 @@ const FormPage = ({ address, categories, statuses }) => {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location)
-    })();
-  }
+      setLocationLoading(false)
+    } catch (e) {
+      console.log(e);
+      setLocationLoading(false)
+    }
+
+  }, [])
+
+  useEffect(() => {
+    if (!id) {
+      takeLocation();
+    }
   }, []);
 
   useEffect(() => {
-  location && setFormValues((prev) => ({ ...prev, location: location?.coords.latitude + ',' + location?.coords?.longitude }))
-}, [location])
+    location && setFormValues((prev) => ({ ...prev, location: location?.coords.latitude + ',' + location?.coords?.longitude }))
+  }, [location])
 
   const submitHandler = async () => {
-    
+
     const arr = Object.values(formValues)
     if (arr.some(el => el == '' || image.length <= 0)) {
       return Alert.alert('You missed something')
     }
     try {
-      if(id) {
+      if (id) {
         updateItem(formValues, image, setIsLoading, navigation, id)
-      }else{
+      } else {
         addItem(formValues, image, setIsLoading, navigation)
       }
-    } catch (e) {  Alert.alert(e)}
+    } catch (e) { Alert.alert(e) }
 
   }
 
@@ -96,52 +104,61 @@ const FormPage = ({ address, categories, statuses }) => {
           <Input
             placeholder='OWNER'
             keyboardType='name-phone-pad'
-            onChangeText={value => setFormValues((prev) => ({ ...prev, owner: value }))} 
+            onChangeText={value => setFormValues((prev) => ({ ...prev, owner: value }))}
             value={formValues.owner}
-            />
+          />
           <Input
             placeholder='PHONE'
             keyboardType='phone-pad'
-            onChangeText={value => setFormValues((prev) => ({ ...prev, phone: value }))} 
+            onChangeText={value => setFormValues((prev) => ({ ...prev, phone: value }))}
             value={formValues.phone}
-            />
-                 <Input
+          />
+          <Input
             placeholder='NATOR NAME'
             keyboardType='name-phone-pad'
-            onChangeText={value => setFormValues((prev) => ({ ...prev, nator: value }))} 
+            onChangeText={value => setFormValues((prev) => ({ ...prev, nator: value }))}
             value={formValues.nator}
-            />
-             <Input
+          />
+          <Input
             placeholder='NATOR PHONE'
             keyboardType='phone-pad'
-            onChangeText={value => setFormValues((prev) => ({ ...prev, natorPhone: value }))} 
+            onChangeText={value => setFormValues((prev) => ({ ...prev, natorPhone: value }))}
             value={formValues.natorPhone}
-            />
+          />
           <Input
             placeholder='PROPERTY SIZE'
             keyboardType='number-pad'
-            onChangeText={value => setFormValues((prev) => ({ ...prev, size: value }))} 
+            onChangeText={value => setFormValues((prev) => ({ ...prev, size: value }))}
             value={formValues.size}
-            />
+          />
           <Input
             placeholder='PRICE'
             keyboardType='number-pad'
-            onChangeText={value => setFormValues((prev) => ({ ...prev, price: value }))} 
+            onChangeText={value => setFormValues((prev) => ({ ...prev, price: value }))}
             value={formValues.price}
-            />
-            <Input
-            placeholder='LOCATION'
-            keyboardType='name-phone-pad'
-            onChangeText={value => setFormValues((prev) => ({ ...prev, location: value }))} 
-            value={formValues.location}
-            />
+          />
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ flex: 1 }}>
+              <Input
+                placeholder='LOCATION'
+                keyboardType='name-phone-pad'
+                onChangeText={value => setFormValues((prev) => ({ ...prev, location: value }))}
+                value={formValues.location}
+              />
+            </View>
+            <Button type='solid' color={colors.blueyLight} title='setlocation' disabled={locationLoading} onPress={takeLocation} >
+              {!locationLoading ? <Text style={{ color: '#fff', marginRight: 10, fontWeight: '500' }}>Take Location</Text> :
+                <ActivityIndicator color={colors.lightGreyHex} />}
+            </Button>
+          </View>
+
           <Input
             placeholder='REF.'
             keyboardType='name-phone-pad'
-            onFocus={() => setFormValues((prev) => ({ ...prev, Ref: '' }))}
+            // onFocus={() => setFormValues((prev) => ({ ...prev, Ref: '' }))}
             onChangeText={value => setFormValues((prev) => ({ ...prev, Ref: value }))}
-            value={formValues.Ref} 
-            />
+            value={formValues.Ref}
+          />
           <View style={styles.inputContainer}>
             <Text style={[styles.textLabel, { paddingRight: 10 }]}>TYPE:</Text>
             <HeaderBtn name='Rental' isActive={formValues.type} onPressHandler={() => () => setFormValues(prev => ({ ...prev, type: 'Rental' }))} />
@@ -162,7 +179,7 @@ const FormPage = ({ address, categories, statuses }) => {
           </View>
           <Input
             placeholder='CATEGORY'
-            onFocus={() => setFormValues(prev => ({ ...prev, category: '' }))}
+            // onFocus={() => setFormValues(prev => ({ ...prev, category: '' }))}
             value={formValues.category}
             keyboardType='name-phone-pad'
             onChangeText={value => setFormValues((prev) => ({ ...prev, category: value }))} />
@@ -180,7 +197,7 @@ const FormPage = ({ address, categories, statuses }) => {
           <Input
             placeholder='ADDRESS'
             keyboardType='name-phone-pad'
-            onFocus={() => setFormValues((prev) => ({ ...prev, address: '' }))}
+            // onFocus={() => setFormValues((prev) => ({ ...prev, address: '' }))}
             onChangeText={value => setFormValues((prev) => ({ ...prev, address: value }))}
             value={formValues.address} />
           <View style={[{ flexDirection: 'row', marginHorizontal: 20, marginTop: -10, paddingBottom: 20, flexWrap: 'wrap' }]}>
@@ -198,13 +215,13 @@ const FormPage = ({ address, categories, statuses }) => {
             onChangeText={value => setFormValues((prev) => ({ ...prev, note: value }))}
             value={formValues.note} />
         </KeyboardAvoidingView>
-        <ImagePickerComp image={image} setImage={setImage} />
-        <Button type='solid' color={colors.blueyLight} title='Submit' disabled={isLoading} onPress={submitHandler} >
-          {!isLoading ? <Text style={{color: '#fff', marginRight: 10, fontWeight: '500'}}>Submit</Text> :
-        <ActivityIndicator color={colors.lightGreyHex} />}
-        </Button>
+          <ImagePickerComp image={image} setImage={setImage} />
+          <Button type='solid' color={colors.blueyLight} title='Submit' disabled={isLoading} onPress={submitHandler} >
+            {!isLoading ? <Text style={{ color: '#fff', marginRight: 10, fontWeight: '500' }}>Submit</Text> :
+              <ActivityIndicator color={colors.lightGreyHex} />}
+          </Button>
         </>
-      ) : (<ActivityIndicator size='large' color={colors.bluey} style={{marginTop: '55%'}} />)}
+      ) : (<ActivityIndicator size='large' color={colors.bluey} style={{ marginTop: '55%' }} />)}
     </ScrollView>
   );
 }

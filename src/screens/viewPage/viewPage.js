@@ -18,12 +18,31 @@ const ViewPage = () => {
   const [slides, setSlides] = useState([])
   const [modalVisible, setModalVisible] = useState(false)
   useEffect(() => {
+    if(id){
     getOneById(id, setData, setSlides, setIsLoading)
+    }
   }, [])
+
+  useEffect(() => {
+    navigation.addListener('focus', async () => {
+      try{
+      if(id)  await getOneById(id, setData, setSlides, setIsLoading)
+    }
+  catch(e) {
+    console.log('eeeeeeee', e);
+  }})
+    return navigation.removeListener('focus', async () => {
+      try{
+      if(id)  await getOneById(id, setData, setSlides, setIsLoading)
+    }
+  catch(e) {
+    console.log(e);
+  }})
+  }, [id, navigation])
 
   const locationArr = data?.data?.location?.split(',')
   const onLoactionPress = () => {
-      const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+  const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
   const latLng = `${locationArr[0]},${locationArr[1]}`;
   const label = data?.data?.owner + ', ' + data?.data?.address;
   const url = Platform.select({
@@ -34,9 +53,9 @@ const ViewPage = () => {
   Linking.openURL(url);
   }
   const onEditPress = () => {
-    navigation.replace('formPage', {id})
+    navigation.navigate('formPage', {id})
   }
-  console.log(data);
+
   const renderItem = ({ item }) => {
     return (
       <Image
@@ -47,13 +66,14 @@ const ViewPage = () => {
       />
     );
   }
+
   const renderInfo = () => {
     if(data){
       delete data.data.gallery
       data.data.created = toDateTime(data.data?.created)
       data.data.updated = toDateTime(data.data?.updated)
       const result = Object.keys(data.data).sort().map((key) => {
-      if(key === 'size') data.data[key] = data.data[key] + ' m²'
+      if(key === 'size' && data.data[key].split(' ').length === 1) data.data[key] = data.data[key] + ' m²'
       if(key === 'location') {
         return (
           <TouchableOpacity onPress={onLoactionPress} key={key} style={styles.infoContainer}>

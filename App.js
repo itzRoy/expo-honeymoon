@@ -32,7 +32,7 @@ import { getHeader, getPageData } from './api';
         <NavigationContainer>
             <StatusBar backgroundColor='#f2f2f2' />
       <Stack.Navigator >
-        <Stack.Screen name="dataPage" children={() => <DataPage data={data} isLoading={isLoading} resultCount={resultCount} headerElements={headerElements} categories={categories} statuses={statuses} isActive={isActive} setIsActive={setIsActive} refresh={refresh} setRefresh={setRefresh} />} options={{headerShown: false}}/>
+        <Stack.Screen name="dataPage" children={() => <DataPage setHeaderElements={setHeaderElements} setCategories={setCategories} setData={setData} data={data} setIsLoading={setIsLoading} isLoading={isLoading} resultCount={resultCount} headerElements={headerElements} categories={categories} statuses={statuses} isActive={isActive} setIsActive={setIsActive} refresh={refresh} setRefresh={setRefresh} />} options={{headerShown: false}}/>
         <Stack.Screen name="viewPage" children={() => <ViewPage />} options={{animation: 'slide_from_right', headerShown: true, headerTitle: '', headerBackground: () => (<View style={{width: '100%', height: '100%', backgroundColor: '#f2f2f2'}} />) }} />
         <Stack.Screen name="formPage" children={() => <FormPage address={headerElements} categories={categories} statuses={statuses} />} options={{animation: 'slide_from_right', headerShown: true, headerTitle: '', headerBackground: () => (<View style={{width: '100%', height: '100%', backgroundColor: '#f2f2f2'}} />) }} />
             

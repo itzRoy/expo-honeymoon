@@ -7,7 +7,8 @@ import Filter from '../../components/filter/filter';
 import styles from './dataPage.styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/core';
-const DataPage = ({ data, isLoading, resultCount, headerElements, categories, statuses, isActive, setIsActive, refresh, setRefresh}) => {
+import { getHeader, getPageData } from '../../../api';
+const DataPage = ({ setCategories, setHeaderElements, data, isLoading, setIsLoading, setData, resultCount, headerElements, categories, statuses, isActive, setIsActive, refresh, setRefresh}) => {
   const [filteredData, setFilteredData] = useState()
   const [modalVisible, setModalVisible] = useState(false);
   const navigation= useNavigation()
@@ -26,6 +27,26 @@ const backAction = () => {
       return () => BackHandler.removeEventListener(backAction)
     }
   }, [])
+
+    useEffect(() => {
+    navigation.addListener('focus', async () => {
+      try{
+      getHeader(setHeaderElements, setCategories)
+      getPageData(setData, setIsLoading, () =>{}, isActive)
+      }catch(e) {
+        console.log(e);
+      }
+    })
+      
+    return navigation.removeListener('focus', async () => {
+      try{
+      getHeader(setHeaderElements, setCategories)
+      getPageData(setData, setIsLoading, () =>{}, isActive)
+      }catch(e) {
+        console.log(e);
+      }
+    })
+  })
   return (
     <SafeAreaView>
       <Header
